@@ -1,5 +1,7 @@
 require 'lib/gojira_api'
 
+CONFIG_PATH = File.join(ENV['HOME'], '.gojira')
+
 class Gojira
 	attr_reader :gojira
 
@@ -8,9 +10,18 @@ class Gojira
 		@gojira.login user,pass
 	end
 
+	def self.load_config
+		if not File.exist? CONFIG_PATH
+			puts "no config found at ~/.gojira \nformat: \n\tpath\n\tuser\n\tpass"
+			exit
+		end
+		File.read(CONFIG_PATH).split("\n")
+	end
+
 	def run(args)
 		parse_args(args)
 	end
+
 
 	def show_projects
 		output = @gojira.projects.map do |project|
@@ -21,7 +32,7 @@ class Gojira
 	
 	def show_issues issue_id=nil
 		output = @gojira.user_issues.enum_with_index.map do |issue,id|
-			"#{id} \t #{format_issue issue,issue_id}"
+			"#{id} #{format_issue issue,issue_id}"
 		end
 		output = output[issue_id] if issue_id
 		print output
@@ -53,7 +64,7 @@ class Gojira
 		status = @gojira.issue_status issue.key
 		priority = @gojira.issue_priority issue.key
 
-		"#{issue.key} - #{issue.summary} \n #{status[:name]} - #{priority[:name]} \n #{issue.description if verbose}"
+		"#{issue.key} - #{issue.summary} \n\t #{status[:name]} - #{priority[:name]} \n #{issue.description if verbose}\n\n"
 	end
 
 	def format_action(action)
@@ -81,5 +92,5 @@ end
 
 
 
-gj = Gojira.new "http://sandbox.onjira.com", "gojira", "gojira" #TODO parse config file, init and run
+gj = Gojira.new *Gojira.load_config
 gj.run ARGV
