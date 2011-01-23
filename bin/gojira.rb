@@ -1,4 +1,5 @@
-require 'lib/gojira_api'
+#!/usr/bin/env ruby
+require 'gojira_api.rb'
 
 CONFIG_PATH = File.join(ENV['HOME'], '.gojira')
 
@@ -39,7 +40,7 @@ class Gojira
 	end
 
 	def update_status(issue,new_action=nil)
-	issue = externalize_issue(issue)
+		issue = externalize_issue(issue)
 		valid_actions = @gojira.valid_actions(issue)
 		output = valid_actions.enum_with_index.map do |action,id|
 			"#{id} - #{format_action action}"
@@ -80,9 +81,9 @@ class Gojira
 		case command
 			when /i/
 				then show_issues args[1]
-			when /pr/
+			when /p/
 				then show_projects
-			when /up/
+			when /u/
 				then update_status args[1], args[2]
 			else
 				show_issues
