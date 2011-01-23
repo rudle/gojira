@@ -80,7 +80,7 @@ class GojiraAPI
 	def set_action(issue_key, action_key)
 		action = valid_actions(issue_key).find {|action| action[:id] == action_key}
 		return if not action
-		@jira.progressWorkflowAction("FWL-696", action_key, []) rescue return
+		@jira.progressWorkflowAction(issue_key, action_key, []) rescue return
 		action
 	end
 
