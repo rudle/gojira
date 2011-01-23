@@ -43,20 +43,26 @@ class Gojira
 	end
 	
 	def valid_actions(key)
-		statuses.select do |s| 
-			@jira.getAvailableActions(key).map(&:id).include? s[:id]
+		@jira.getAvailableActions(key).map do |action|
+			{
+				:id => action.id,
+				:name => action.name
+			}
 		end
 	end
 
 	def add_comment(key, body)
 		comment = Jira4R::V2::RemoteComment.new
 		comment.body = body
-		@jira.addComment key, comment rescue return nil
+		@jira.addComment key, comment rescue return
 		comment
 	end
 
-	def set_status(issue_key, status_key)
-		@jira.progressWorkflowAction("FWL-696", 1, [])
+	def set_action(issue_key, action_key)
+		action = valid_actions(issue_key).find {|action| action[:id] == action_key}
+		return if not action
+		@jira.progressWorkflowAction("FWL-696", action_key, []) rescue return
+		action
 	end
 
 	def method_missing(sym, *args, &block)

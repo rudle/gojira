@@ -1,7 +1,7 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), 'spec_helper')
-require 'gojira'
+require 'gojira_api'
 
-describe "gojira" do
+describe "gojira_api" do
 	before :all do
 		@gojira = Gojira.new "http://sandbox.onjira.com"
 	end
@@ -47,20 +47,22 @@ describe "gojira" do
 
 		it "should return available statuses for an issue" do
 			issue_key = @gojira.user_issues.first.key
-			@gojira.valid_actions(issue_key).should_not be_nil
+			@gojira.valid_actions(issue_key).should_not be_empty
 		end
 
 		it "should set an issue's status" do
 			issue_key = @gojira.user_issues.first.key
-			status_key = @gojira.valid_actions(issue_key).first
-			@gojira.set_status(issue_key, status_key).should == @gojira.status(status_key)
-			status_key = @gojira.valid_actions(issue_key).first
-			@gojira.set_status(issue_key, status_key).should == @gojira.status(status_key)
+			action_key = @gojira.valid_actions(issue_key).first[:id]
+			@gojira.set_action(issue_key, action_key).should_not be_nil
+			action_key = @gojira.valid_actions(issue_key).first[:id]
+			@gojira.set_action(issue_key, action_key).should_not be_nil
 		end
 
-		it "should add a comment to an issue" do
-			issue_key = @gojira.user_issues.first.key
-			@gojira.add_comment(issue_key, "my comment").body.should == "my comment"
+		if ENV['test_comments']
+			it "should add a comment to an issue" do
+				issue_key = @gojira.user_issues.first.key
+				@gojira.add_comment(issue_key, "my comment").body.should == "my comment"
+			end
 		end
 	end
 end
