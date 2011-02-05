@@ -14,7 +14,7 @@ describe "gojira" do
 
 	describe "output functions" do
 		before :all do
-			#@gojira.stub!(:print)
+			@gojira.stub!(:print)
 		end
 
 		it "should print the projects" do
@@ -30,7 +30,7 @@ describe "gojira" do
 
 			it "should print issue info given an issue's internal ID" do
 				@gojira.should_receive(:print)
-				@gojira.show_issues(0).should 
+				@gojira.show_issues(0)
 			end
 		end
 
@@ -42,6 +42,7 @@ describe "gojira" do
 
 			it "should set the action of the specified ticket to the specified action" do
 				issue_key = @gojira.gojira.user_issues.first.key
+				puts issue_key
 				@gojira.update_status issue_key, 0
 			end
 

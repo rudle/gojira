@@ -40,7 +40,7 @@ class Gojira
 	end
 
 	def update_status(issue,new_action=nil)
-		issue = externalize_issue(issue)
+		issue = normalize(issue)
 		valid_actions = @gojira.valid_actions(issue)
 		output = valid_actions.enum_with_index.map do |action,id|
 			"#{id} - #{format_action action}"
@@ -72,18 +72,19 @@ class Gojira
 		"#{action[:name]}"
 	end
 
-	def externalize_issue(key)
+	def normalize(key)
+		return key if key =~ /[A-Z]+\-/ 
 		@gojira.user_issues[key.to_i].key
 	end
 
 	def parse_args(args)
 		command = args[0]
 		case command
-			when /i/
+			when /^i/
 				then show_issues args[1]
-			when /p/
+			when /^p/
 				then show_projects
-			when /u/
+			when /^u/
 				then update_status args[1], args[2]
 			else
 				show_issues
